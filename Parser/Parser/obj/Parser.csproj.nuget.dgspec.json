@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\HP\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj": {}
+    "C:\\Users\\scaph\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj": {}
   },
   "projects": {
-    "C:\\Users\\HP\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj": {
+    "C:\\Users\\scaph\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\HP\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj",
+        "projectUniqueName": "C:\\Users\\scaph\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj",
         "projectName": "Parser",
-        "projectPath": "C:\\Users\\HP\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\HP\\Desktop\\webparser\\Parser\\Parser\\obj\\",
+        "projectPath": "C:\\Users\\scaph\\Desktop\\webparser\\Parser\\Parser\\Parser.csproj",
+        "packagesPath": "C:\\Users\\scaph\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\scaph\\Desktop\\webparser\\Parser\\Parser\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\scaph\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,8 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://www.myget.org/F/discord-net/api/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
@@ -41,6 +44,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.0.1, )"
+            },
             "HtmlAgilityPack": {
               "target": "Package",
               "version": "[1.11.54, )"
@@ -62,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

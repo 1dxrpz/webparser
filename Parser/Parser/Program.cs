@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using OfficeOpenXml;
 using System.Net;
 
 public class ParsedPage
@@ -24,16 +25,125 @@ public class ParsedPage
 
 public class Program
 {
-	static List<string> links = new();
+	static List<string> Headers = new()
+	{
+		"ID",
+		"title",
+		"about",
+		"image",
+		"ingredients_tags",
+		"headings_text",
+		"recipe_region",
+		"portions",
+		"recipe_time",
+		"recipe_id",
+		"recipe_like",
+		"recipe_dislike",
+		"recipe_calories",
+		"recipe_fat",
+		"recipe_protein",
+		"recipe_carbs",
+		"href",
+		"ingredients_name_list_0",
+		"ingredients_name_list_1",
+		"ingredients_name_list_2",
+		"ingredients_name_list_3",
+		"ingredients_name_list_4",
+		"ingredients_name_list_5",
+		"ingredients_name_list_6",
+		"ingredients_name_list_7",
+		"ingredients_name_list_8",
+		"ingredients_name_list_9",
+		"ingredients_name_list_10",
+		"ingredients_name_list_11",
+		"ingredients_name_list_12",
+		"ingredients_name_list_13",
+		"ingredients_name_list_14",
+		"ingredients_name_list_15",
+		"ingredients_name_list_16",
+		"ingredients_name_list_17",
+		"ingredients_name_list_18",
+		"ingredients_name_list_19",
+		"ingredients_name_list_20",
+		"ingredients_name_list_21",
+		"ingredients_name_list_22",
+		"ingredients_name_list_23",
+		"ingredients_name_list_24",
+		"ingredients_name_list_25",
+		"ingredients_name_list_26",
+		"ingredients_name_list_27",
+		"ingredients_value_list_0",
+		"ingredients_value_list_1",
+		"ingredients_value_list_2",
+		"ingredients_value_list_3",
+		"ingredients_value_list_4",
+		"ingredients_value_list_5",
+		"ingredients_value_list_6",
+		"ingredients_value_list_7",
+		"ingredients_value_list_8",
+		"ingredients_value_list_9",
+		"ingredients_value_list_10",
+		"ingredients_value_list_11",
+		"ingredients_value_list_12",
+		"ingredients_value_list_13",
+		"ingredients_value_list_14",
+		"ingredients_value_list_15",
+		"ingredients_value_list_16",
+		"ingredients_value_list_17",
+		"ingredients_value_list_18",
+		"ingredients_value_list_19",
+		"ingredients_value_list_20",
+		"ingredients_value_list_21",
+		"ingredients_value_list_22",
+		"ingredients_value_list_23",
+		"ingredients_value_list_24",
+		"ingredients_value_list_25",
+		"ingredients_value_list_26",
+		"ingredients_value_list_27",
+		"recipe_step_text_list_0",
+		"recipe_step_text_list_1",
+		"recipe_step_text_list_2",
+		"recipe_step_text_list_3",
+		"recipe_step_text_list_4",
+		"recipe_step_text_list_5",
+		"recipe_step_text_list_6",
+		"recipe_step_text_list_7",
+		"recipe_step_text_list_8",
+		"recipe_step_text_list_9",
+		"recipe_step_text_list_10",
+		"recipe_step_text_list_11",
+		"recipe_step_text_list_12",
+		"recipe_step_text_list_13",
+		"recipe_step_text_list_14",
+		"recipe_step_text_list_15",
+		"recipe_step_text_list_16",
+		"recipe_step_text_list_17",
+		"recipe_step_text_list_18",
+		"recipe_step_text_list_19",
+		"recipe_step_text_list_20",
+		"recipe_step_text_list_21",
+		"recipe_step_text_list_22",
+		"recipe_step_text_list_23",
+		"recipe_step_text_list_24",
+		"recipe_step_text_list_25",
+		"recipe_step_text_list_26",
+		"recipe_step_text_list_27",
+		"recipe_step_text_list_28",
+		"recipe_step_text_list_29"
+	};
 	static List<Thread> threads = new();
 	static List<ParsedPage> ParsedPages = new();
 
 	private static void Main(string[] args)
 	{
-		for (int x = 0; x < 1; x++)
+		ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+		int row = 1;
+		var package = new ExcelPackage();
+		ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
+		for (int x = 0; x < 14; x++)
 		{
 			Console.WriteLine($"from {x * 50 + 1} to {x * 50 + 50}");
-			for (int i = x * 50 + 1; i < 2; i++) // x * 50 + 50
+			for (int i = x * 50 + 1; i < x * 50 + 50; i++)
 			{
 				Thread thread = new Thread(() => ScrapLinks(i));
 				thread.Start();
@@ -46,54 +156,72 @@ public class Program
 			}
 			Console.WriteLine("wait");
 			Thread.Sleep(2000);
-
 		}
-
-		for (int x = 0; x < links.Count; x++)
+		for (int x = 1; x < Headers.Count; x++)
 		{
-			ScrapPage(x);
+			worksheet.Cells[row, x].Value = Headers[x];
 		}
 		ParsedPages.ForEach(v =>
 		{
-			File.AppendAllText("out.xlsx", $"{v.Id}\t" +
-				$"{v.Title}\t" +
-				$"{v.About}\t" +
-				$"{v.Image}\t" +
-				$"{string.Join(',', v.Ingredients.Select(x => x.Item1))}\t" +
-				$"{string.Join(',', v.Headings)}\t" +
-				$"{v.Region}\t" +
-				$"{v.Portions}\t" +
-				$"{v.Time}\t" +
-				$"{v.Id}\t" +
-				$"{v.Likes}\t" +
-				$"{v.Dislikes}\t" +
-				$"{v.Calories}\t" +
-				$"{v.Fat}\t" +
-				$"{v.Protein}\t" +
-				$"{v.Carbohydrate}\t" +
-				$"{v.Href}\t");
+			row++;
+			worksheet.Cells[row, 1].Value = v.Id;
+			worksheet.Cells[row, 2].Value = v.Title;
+			worksheet.Cells[row, 3].Value = v.About;
+			worksheet.Cells[row, 4].Value = v.Image;
+			worksheet.Cells[row, 5].Value = string.Join(',', v.Ingredients.Select(x => x.Item1));
+			worksheet.Cells[row, 6].Value = string.Join(',', v.Headings);
+			worksheet.Cells[row, 7].Value = v.Region;
+			worksheet.Cells[row, 8].Value = v.Portions;
+			worksheet.Cells[row, 9].Value = v.Time;
+			worksheet.Cells[row, 10].Value = v.Id;
+			worksheet.Cells[row, 11].Value = v.Likes;
+			worksheet.Cells[row, 12].Value = v.Dislikes;
+			worksheet.Cells[row, 13].Value = v.Calories;
+			worksheet.Cells[row, 14].Value = v.Fat;
+			worksheet.Cells[row, 15].Value = v.Protein;
+			worksheet.Cells[row, 16].Value = v.Carbohydrate;
+			worksheet.Cells[row, 17].Value = v.Href;
+			for (int x = 0; x < v.Ingredients.Count; x++)
+			{
+				worksheet.Cells[row, x + 18].Value = v.Ingredients[x].Item1;
+			}
+			for (int x = 0; x < v.Ingredients.Count; x++)
+			{
+				worksheet.Cells[row, x + 46].Value = v.Ingredients[x].Item2;
+			}
+			for (int x = 0; x < v.Steps.Count; x++)
+			{
+				worksheet.Cells[row, x + 74].Value = v.Steps[x];
+			}
 		});
+		FileInfo fileInfo = new FileInfo("out.xlsx");
+		package.SaveAs(fileInfo);
+
 	}
-	static void ScrapPage(int i)
+	static int LinkNum = 0;
+	static void ScrapPage(string url)
 	{
 		using (var client = new WebClient())
 		{
-			var link = $"https://eda.ru{links[i]}";
-            string html = client.DownloadString(link);
+			var link = $"https://eda.ru{url}";
+			string html = client.DownloadString(link);
 
 			HtmlDocument doc = new HtmlDocument();
 			doc.LoadHtml(html);
-
 			var id = link.Split("/").Last();
 			var title = doc.DocumentNode.SelectSingleNode("//h1[contains(@class, 'emotion-gl52ge')]").InnerHtml;
-			var about = doc.DocumentNode.SelectSingleNode("//span[contains(@class, 'emotion-aiknw3')]").InnerHtml;
-			var calories = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'calories')]").InnerHtml;
-			var protein = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'proteinContent')]").InnerHtml;
-			var fat = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'fatContent')]").InnerHtml;
-			var carbohydrate = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'carbohydrateContent')]").InnerHtml;
+			var about = doc.DocumentNode.SelectSingleNode("//span[contains(@class, 'emotion-aiknw3')]");
+			var _calories = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'calories')]");
+			var calories = _calories == null ? "" : _calories.InnerText;
+			var _protein = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'proteinContent')]");
+			var protein = _protein == null ? "" : _protein.InnerText;
+			var _fat = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'fatContent')]");
+			var fat = _fat == null ? "" : _fat.InnerText;
+			var _carbohydrate = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'carbohydrateContent')]");
+			var carbohydrate = _carbohydrate == null ? "" : _carbohydrate.InnerText;
 			var time = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'emotion-my9yfq')]").InnerHtml;
 			var portions = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'recipeYield')]")
-				.SelectSingleNode("//span").InnerHtml;
+				.InnerHtml.Replace("<span>", "").Replace("</span>", "");
 			var headings = doc.DocumentNode.SelectNodes("//ul[contains(@class, 'emotion-1kcflwj')]")
 				.First()
 				.SelectNodes("//span[contains(@class, 'emotion-1h6i17m')]")
@@ -111,13 +239,15 @@ public class Program
 			var steps = doc.DocumentNode.SelectNodes("//span[contains(@class, 'emotion-wdt5in')]")
 				.Select(v => v.SelectSingleNode("//span[contains(@itemprop, 'text')]").InnerHtml)
 				.ToList();
-			var image = doc.DocumentNode.SelectSingleNode("//img[contains(@alt, 'Превью фото')]").Attributes["src"].Value.Replace("c88x88", "-x900");
-
+			var _image = doc.DocumentNode.SelectSingleNode("//img[contains(@alt, 'Превью фото')]");
+			var image = _image == null ? "" : _image.Attributes["src"].Value.Replace("c88x88", "-x900");
+			LinkNum++;
+			Console.WriteLine($"{LinkNum}\t{link}");
 			ParsedPages.Add(new()
 			{
 				Id = id,
 				Title = title,
-				About = about,
+				About = about == null ? "" : about.InnerHtml.Replace("\n", ""),
 				Calories = calories,
 				Carbohydrate = carbohydrate,
 				Fat = fat,
@@ -150,7 +280,7 @@ public class Program
 				HtmlAttribute href = link.Attributes["href"];
 				if (href != null)
 				{
-					links.Add(href.Value);
+					ScrapPage(href.Value);
 				}
 			}
 		}
