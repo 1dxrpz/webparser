@@ -43,7 +43,6 @@ public class Program
 		"recipe_fat",
 		"recipe_protein",
 		"recipe_carbs",
-		"href",
 		"ingredients_name_list_0",
 		"ingredients_name_list_1",
 		"ingredients_name_list_2",
@@ -129,10 +128,11 @@ public class Program
 		"recipe_step_text_list_26",
 		"recipe_step_text_list_27",
 		"recipe_step_text_list_28",
-		"recipe_step_text_list_29"
+		"recipe_step_text_list_29",
 	};
 	static List<Thread> threads = new();
 	static List<ParsedPage> ParsedPages = new();
+	static int id = 0;
 
 	private static void Main(string[] args)
 	{
@@ -140,10 +140,10 @@ public class Program
 		int row = 1;
 		var package = new ExcelPackage();
 		ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Sheet1");
-		for (int x = 0; x < 14; x++)
+		for (int x = 0; x < 1; x++)
 		{
 			Console.WriteLine($"from {x * 50 + 1} to {x * 50 + 50}");
-			for (int i = x * 50 + 1; i < x * 50 + 50; i++)
+			for (int i = x * 50 + 1; i < 2; i++) //x * 50 + 50; i++)
 			{
 				Thread thread = new Thread(() => ScrapLinks(i));
 				thread.Start();
@@ -159,17 +159,18 @@ public class Program
 		}
 		for (int x = 1; x < Headers.Count; x++)
 		{
-			worksheet.Cells[row, x].Value = Headers[x];
+			worksheet.Cells[row, x].Value = Headers[x - 1];
 		}
+		
 		ParsedPages.ForEach(v =>
 		{
 			row++;
-			worksheet.Cells[row, 1].Value = v.Id;
+			worksheet.Cells[row, 1].Value = row - 1;
 			worksheet.Cells[row, 2].Value = v.Title;
 			worksheet.Cells[row, 3].Value = v.About;
 			worksheet.Cells[row, 4].Value = v.Image;
 			worksheet.Cells[row, 5].Value = string.Join(',', v.Ingredients.Select(x => x.Item1));
-			worksheet.Cells[row, 6].Value = string.Join(',', v.Headings);
+			worksheet.Cells[row, 6].Value = string.Join('>', v.Headings);
 			worksheet.Cells[row, 7].Value = v.Region;
 			worksheet.Cells[row, 8].Value = v.Portions;
 			worksheet.Cells[row, 9].Value = v.Time;
@@ -180,18 +181,17 @@ public class Program
 			worksheet.Cells[row, 14].Value = v.Fat;
 			worksheet.Cells[row, 15].Value = v.Protein;
 			worksheet.Cells[row, 16].Value = v.Carbohydrate;
-			worksheet.Cells[row, 17].Value = v.Href;
 			for (int x = 0; x < v.Ingredients.Count; x++)
 			{
-				worksheet.Cells[row, x + 18].Value = v.Ingredients[x].Item1;
+				worksheet.Cells[row, x + 17].Value = v.Ingredients[x].Item1;
 			}
 			for (int x = 0; x < v.Ingredients.Count; x++)
 			{
-				worksheet.Cells[row, x + 46].Value = v.Ingredients[x].Item2;
+				worksheet.Cells[row, x + 45].Value = v.Ingredients[x].Item2;
 			}
 			for (int x = 0; x < v.Steps.Count; x++)
 			{
-				worksheet.Cells[row, x + 74].Value = v.Steps[x];
+				worksheet.Cells[row, x + 73].Value = v.Steps[x];
 			}
 		});
 		FileInfo fileInfo = new FileInfo("out.xlsx");
@@ -209,8 +209,8 @@ public class Program
 			HtmlDocument doc = new HtmlDocument();
 			doc.LoadHtml(html);
 			var id = link.Split("/").Last();
-			var title = doc.DocumentNode.SelectSingleNode("//h1[contains(@class, 'emotion-gl52ge')]").InnerHtml;
-			var about = doc.DocumentNode.SelectSingleNode("//span[contains(@class, 'emotion-aiknw3')]");
+			var title = doc.DocumentNode.SelectSingleNode("//meta[contains(@itemprop, 'keywords')]").GetAttributeValue("content", "");
+			var about = doc.DocumentNode.SelectSingleNode("//meta[contains(@itemprop, 'description')]").GetAttributeValue("content", "");
 			var _calories = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'calories')]");
 			var calories = _calories == null ? "" : _calories.InnerText;
 			var _protein = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'proteinContent')]");
@@ -219,7 +219,8 @@ public class Program
 			var fat = _fat == null ? "" : _fat.InnerText;
 			var _carbohydrate = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'carbohydrateContent')]");
 			var carbohydrate = _carbohydrate == null ? "" : _carbohydrate.InnerText;
-			var time = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'emotion-my9yfq')]").InnerHtml;
+			var time = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'cookTime')]").InnerHtml;
+			var region = doc.DocumentNode.SelectSingleNode("//meta[contains(@itemprop, 'recipeCuisine')]").GetAttributeValue("content", "");
 			var portions = doc.DocumentNode.SelectSingleNode("//span[contains(@itemprop, 'recipeYield')]")
 				.InnerHtml.Replace("<span>", "").Replace("</span>", "");
 			var headings = doc.DocumentNode.SelectNodes("//ul[contains(@class, 'emotion-1kcflwj')]")
@@ -227,6 +228,7 @@ public class Program
 				.SelectNodes("//span[contains(@class, 'emotion-1h6i17m')]")
 				.Select(v => v.InnerHtml)
 				.ToList();
+			var category = doc.DocumentNode.SelectSingleNode("//meta[contains(@itemprop, 'recipeCategory')]").GetAttributeValue("content", "");
 			var ingredientsCount = doc.DocumentNode.SelectNodes("//span[contains(@class, 'emotion-bsdd3p')]")
 				.Select(v => v.InnerHtml)
 				.ToList();
@@ -247,7 +249,7 @@ public class Program
 			{
 				Id = id,
 				Title = title,
-				About = about == null ? "" : about.InnerHtml.Replace("\n", ""),
+				About = about == null ? "" : about,
 				Calories = calories,
 				Carbohydrate = carbohydrate,
 				Fat = fat,
@@ -258,8 +260,12 @@ public class Program
 				Portions = portions,
 				Steps = steps,
 				Time = time,
-				Headings = headings,
-				Region = headings[2],
+				Headings = new()
+				{
+					category,
+					headings.Last()
+				},
+				Region = region,
 				Image = image,
 				Href = link
 			});
